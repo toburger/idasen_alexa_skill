@@ -1,0 +1,4 @@
+node_modules/
+.vscode/
+.well-known/
+certs/
