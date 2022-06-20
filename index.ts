@@ -41,6 +41,29 @@ const LaunchRequestHandler: Alexa.RequestHandler = {
 //   },
 // };
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function setPosition(position: "stand" | "sit", retry = 1) {
+  console.log({ retry, position });
+  if (retry >= 3) {
+    return;
+  }
+  const x = await fetch(`http://localhost:8888/${position}`, {
+    method: "POST",
+  });
+  const json = await x.json();
+  console.log("Position gesetzt", util.inspect(json, { depth: null }));
+  if (
+    JSON.stringify(json) ===
+    JSON.stringify({ error: { idasenError: "safetyFeatureKickedIn" } })
+  ) {
+    await sleep(1000);
+    await setPosition(position, retry + 1);
+  }
+}
+
 const SitIntentInputHandler: Alexa.RequestHandler = {
   canHandle: function (input: Alexa.HandlerInput) {
     const request = input.requestEnvelope.request;
@@ -49,13 +72,7 @@ const SitIntentInputHandler: Alexa.RequestHandler = {
     );
   },
   handle: function (input: Alexa.HandlerInput) {
-    fetch("http://localhost:8888/sit", {
-      method: "POST",
-    })
-      .then((x) => x.json())
-      .then((x) =>
-        console.log("Sitzposition gesetzt", util.inspect(x, { depth: null }))
-      );
+    setPosition("sit");
 
     const speechText = "Idåsen Desk wird in die Sitzposition gefahren.";
     return input.responseBuilder
@@ -73,13 +90,7 @@ const StandIntentInputHandler: Alexa.RequestHandler = {
     );
   },
   handle: function (input: Alexa.HandlerInput) {
-    fetch("http://localhost:8888/stand", {
-      method: "POST",
-    })
-      .then((x) => x.json())
-      .then((x) =>
-        console.log("Stehposition gesetzt", util.inspect(x, { depth: null }))
-      );
+    setPosition("sit");
 
     const speechText = "Idåsen Desk wird in die Stehposition gefahren.";
     return input.responseBuilder
