@@ -90,7 +90,7 @@ const StandIntentInputHandler: Alexa.RequestHandler = {
     );
   },
   handle: function (input: Alexa.HandlerInput) {
-    setPosition("sit");
+    setPosition("stand");
 
     const speechText = "Idåsen Desk wird in die Stehposition gefahren.";
     return input.responseBuilder
@@ -116,7 +116,7 @@ const MeasureHeightIntentInputHandler: Alexa.RequestHandler = {
     } = await response.json();
 
     if (json.ok) {
-      const speechTextOk = "Idåsen Desk wird in die Stehposition gefahren.";
+      const speechTextOk = "Idåsen Desk Höhe.";
       const height = json.ok;
       return input.responseBuilder
         .speak(
